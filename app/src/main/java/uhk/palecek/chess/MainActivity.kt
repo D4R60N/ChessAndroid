@@ -34,14 +34,26 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import io.socket.client.IO
+import io.socket.client.Socket
 import uhk.palecek.chess.ui.theme.ChessTheme
 import uhk.palecek.chess.consts.BottomNavItem;
 import uhk.palecek.chess.consts.Routes;
 import uhk.palecek.chess.screens.GameScreen
+import java.net.URISyntaxException
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        try
+//        {
+//            val mSocket: Socket = IO.socket("localhost:8080")
+//            mSocket.connect()
+//        } catch (e: URISyntaxException)
+//        {
+//            println(e)
+//        }
         enableEdgeToEdge()
         setContent {
             ChessTheme {

@@ -58,4 +58,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.chesslib)
+    implementation("io.socket:socket.io-client:2.0.1") {
+        exclude(group = "org.json", module = "json")
+    }
+
 }
