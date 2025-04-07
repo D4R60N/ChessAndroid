@@ -34,12 +34,20 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import cz.uhk.fim.cryptoapp.networkModule
+import cz.uhk.fim.cryptoapp.viewModelModule
+import cz.uhk.fim.cryptoapp.viewmodels.UserViewModel
 import io.socket.client.IO
 import io.socket.client.Socket
+import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.context.startKoin
 import uhk.palecek.chess.ui.theme.ChessTheme
 import uhk.palecek.chess.consts.BottomNavItem;
 import uhk.palecek.chess.consts.Routes;
 import uhk.palecek.chess.screens.GameScreen
+import uhk.palecek.chess.screens.SignInScreen
+import uhk.palecek.chess.screens.SignUpScreen
 import java.net.URISyntaxException
 
 class MainActivity : ComponentActivity() {
@@ -54,6 +62,13 @@ class MainActivity : ComponentActivity() {
 //        {
 //            println(e)
 //        }
+        startKoin { //inicializace DI
+            androidContext(this@MainActivity)
+            modules(
+                viewModelModule,
+                networkModule,
+            )
+        }
         enableEdgeToEdge()
         setContent {
             ChessTheme {
@@ -66,13 +81,16 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun MainScreen(navController: NavHostController, viewModel: UserViewModel = koinViewModel()) {
     //proměnné jejichž hodnotu potřebujeme zachovat i po rekompozici (překreslení) musíme ukládat pomocí remember a mutableStateOf, případně funkcí podobných
     var selectedItem by remember { mutableStateOf(0) }
 
     //náš list itemů použitých v bottom navigation bar
-    val items = listOf(
+    val items = if (viewModel.isSignIn()) listOf(
         BottomNavItem.Game,
+    ) else listOf(
+        BottomNavItem.SignIn,
+        BottomNavItem.SignUp
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -80,7 +98,7 @@ fun MainScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Crypto App") },
+                title = { Text("Chess App") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
@@ -128,15 +146,15 @@ fun MainScreen(navController: NavHostController) {
                             selectedItem = index
                             navController.navigate(item.screenRoute) {
                                 navController.graph.startDestinationRoute?.let { screenRoute ->
-                                    popUpTo(screenRoute) {  //odebrání ostatních obrazovek z back stacku
+                                    popUpTo(screenRoute) {
                                         saveState =
-                                            true//uložení stavu obrazovek odstraněných z back stacku
+                                            true
                                     }
                                 }
                                 launchSingleTop =
-                                    true //zabraňuje vytváření nových instancí stejné obrazovky
+                                    true
                                 restoreState =
-                                    true //obnovení stavu, pokud byl uložen pomocí saveState
+                                    true
                             }
                         },
                         colors = NavigationBarItemDefaults.colors(
@@ -159,9 +177,11 @@ fun MainScreen(navController: NavHostController) {
 fun Navigation(navController: NavHostController, innerPadding: PaddingValues) {
     NavHost(
         navController = navController,
-        startDestination = Routes.Game,
+        startDestination = Routes.SignIn,
         modifier = Modifier.padding(innerPadding)
     ) {
+        composable(Routes.SignIn) { SignInScreen(navController) }
+        composable(Routes.SignUp) { SignUpScreen(navController) }
         composable(Routes.Game) { GameScreen(navController) }
     }
 }

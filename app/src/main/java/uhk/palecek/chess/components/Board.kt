@@ -40,13 +40,13 @@ fun BoardComponent() {
                         for (file in 1..8) {
                             val square = Square.squareAt(63 - index)
                             index++
-                            val isHeighlighted = highlightedSpaces.contains(square)
+                            val isHighlighted = highlightedSpaces.contains(square)
                             map.put(
                                 square,
                                 GameSquare(
                                     (rank + file) % 2 == 0,
                                     board.getPiece(square),
-                                    isHeighlighted,
+                                    isHighlighted,
                                     square == selectedSpace
                                 ) { ->
                                     val piece = board.getPiece(square)
@@ -59,7 +59,7 @@ fun BoardComponent() {
                                             }
                                         }
                                         selectedSpace = square
-                                    } else if (isHeighlighted) {
+                                    } else if (isHighlighted) {
                                         val rank =
                                             if (side == Side.WHITE) Rank.RANK_8 else Rank.RANK_1
                                         val move: Move

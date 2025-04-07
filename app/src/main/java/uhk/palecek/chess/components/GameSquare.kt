@@ -1,20 +1,16 @@
 package uhk.palecek.chess.components
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.github.bhlangonijr.chesslib.Piece
 import uhk.palecek.chess.ui.theme.DarkSquareColor
 import uhk.palecek.chess.ui.theme.LightSquareColor
 import androidx.compose.ui.res.painterResource
-import com.github.bhlangonijr.chesslib.Square
 import uhk.palecek.chess.R
 import uhk.palecek.chess.ui.theme.HighlightedSquareColor
 import uhk.palecek.chess.ui.theme.SelectedSquareColor

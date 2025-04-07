@@ -24,15 +24,10 @@ import uhk.palecek.chess.components.BoardComponent
 fun GameScreen(
     navController: NavController,
 ) {
-    val board = Board();
-
     Column(modifier = Modifier.padding(16.dp)) {
         Spacer(modifier = Modifier.height(16.dp))
         Text("Welcome to the game.")
         BoardComponent()
-    }
-
-    fun makeAMove(move: Move) {
     }
 }
 
