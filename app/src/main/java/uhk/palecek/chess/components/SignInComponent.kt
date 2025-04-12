@@ -30,15 +30,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import cz.uhk.fim.cryptoapp.viewmodels.UserViewModel
 import org.koin.androidx.compose.koinViewModel
 import uhk.palecek.chess.R
 import uhk.palecek.chess.consts.Routes
+import uhk.palecek.chess.viewmodels.UserViewModel
 
 @Composable
 fun SignInComponent(
     navController: NavController,
-    viewModel: UserViewModel = koinViewModel(),
+    viewModel: UserViewModel
 ) {
     var username: String by remember { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -75,8 +75,7 @@ fun SignInComponent(
         )
         Button(
             onClick = {
-                viewModel.onTokenChange("sad")
-                navController.navigate(Routes.Game)
+                viewModel.signIn(username, password)
             },
             modifier = Modifier.background(Color.Transparent),
             colors = ButtonDefaults.buttonColors(

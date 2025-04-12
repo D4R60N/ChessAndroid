@@ -1,20 +1,23 @@
 package cz.uhk.fim.cryptoapp
 
-import cz.uhk.fim.cryptoapp.viewmodels.UserViewModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import uhk.palecek.chess.api.ChessApi
+import uhk.palecek.chess.viewmodels.UserViewModel
 
 val viewModelModule = module {
-    viewModel { UserViewModel() }
+    viewModel { UserViewModel(get()) }
 }
 
 
 val networkModule = module {
     single { provideOkHttpClient() }
-//    single { provideRetrofit(get()) }
-//    single { provideCryptoApi(get()) }
+    single { provideRetrofit(get()) }
+    single { provideCryptoApi(get()) }
 }
 
 //val helperModule = module { //todo
@@ -30,14 +33,14 @@ fun provideOkHttpClient(): OkHttpClient {
         .build()
 }
 
-//fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-//    return Retrofit.Builder()
-//        .baseUrl("https://api.coincap.io/v2/")
-//        .client(okHttpClient)
-//        .addConverterFactory(GsonConverterFactory.create())
-//        .build()
-//}
+fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    return Retrofit.Builder()
+        .baseUrl("http://10.0.2.2:8080")
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+}
 
-//fun provideCryptoApi(retrofit: Retrofit): CryptoApi {
-//    return retrofit.create(CryptoApi::class.java) //zde jse Retrofitu předali naše rozhraní pro API, které Retrofit bude implementovat
-//}
+fun provideCryptoApi(retrofit: Retrofit): ChessApi {
+    return retrofit.create(ChessApi::class.java)
+}

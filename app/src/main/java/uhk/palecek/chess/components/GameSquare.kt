@@ -28,7 +28,7 @@ fun GameSquare(isDarkSquare: Boolean, piece: Piece?, isHighlighted: Boolean, isS
         if (piece !== null && piece !== Piece.NONE)
             Image(
                 painter = painterResource(selectPiece(piece)),
-                contentDescription = "piece"
+                contentDescription = piece.name
             )
     }
 }
