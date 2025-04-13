@@ -88,6 +88,11 @@ class UserViewModel(private val chessApi: ChessApi) : ViewModel() {
             }
         }
     }
+    fun signOut() {
+        _username.value = ""
+        _token.value = null
+        _authState.value = AuthState.Unauthenticated
+    }
 }
 
 sealed class AuthState {

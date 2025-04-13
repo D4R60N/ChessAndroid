@@ -7,7 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -47,7 +46,11 @@ import org.koin.core.context.startKoin
 import uhk.palecek.chess.ui.theme.ChessTheme
 import uhk.palecek.chess.consts.BottomNavItem;
 import uhk.palecek.chess.consts.Routes;
+import uhk.palecek.chess.screens.ForumScreen
 import uhk.palecek.chess.screens.GameScreen
+import uhk.palecek.chess.screens.HomeScreen
+import uhk.palecek.chess.screens.JoinGameScreen
+import uhk.palecek.chess.screens.MatchHistoryScreen
 import uhk.palecek.chess.screens.SignInScreen
 import uhk.palecek.chess.screens.SignUpScreen
 import uhk.palecek.chess.viewmodels.AuthState
@@ -101,8 +104,8 @@ fun MainScreen(navController: NavHostController, viewModel: UserViewModel = koin
                 navController.navigate(Routes.SignIn)
             }
             is AuthState.Authenticated -> {
-                items = listOf(BottomNavItem.Game)
-                navController.navigate(Routes.Game)
+                items = listOf(BottomNavItem.Home, BottomNavItem.Game, BottomNavItem.MatchHistory, BottomNavItem.Forum)
+                navController.navigate(Routes.Home)
             }
             is AuthState.Error -> {
                 Toast.makeText(context, (authState as AuthState.Error).message, Toast.LENGTH_SHORT).show()
@@ -202,6 +205,10 @@ fun Navigation(navController: NavHostController, innerPadding: PaddingValues, vi
         composable(Routes.SignIn) { SignInScreen(navController, viewModel) }
         composable(Routes.SignUp) { SignUpScreen(navController, viewModel) }
         composable(Routes.Game) { GameScreen(navController) }
+        composable(Routes.Home) { HomeScreen(navController) }
+        composable(Routes.JoinGame) { JoinGameScreen(navController) }
+        composable(Routes.MatchHistory) { MatchHistoryScreen(navController) }
+        composable(Routes.Forum) { ForumScreen(navController) }
     }
 }
 
