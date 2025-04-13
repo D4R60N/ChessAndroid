@@ -55,7 +55,6 @@ import uhk.palecek.chess.screens.SignInScreen
 import uhk.palecek.chess.screens.SignUpScreen
 import uhk.palecek.chess.viewmodels.AuthState
 import uhk.palecek.chess.viewmodels.UserViewModel
-import java.net.URISyntaxException
 
 class MainActivity : ComponentActivity() {
 
@@ -103,13 +102,22 @@ fun MainScreen(navController: NavHostController, viewModel: UserViewModel = koin
                 )
                 navController.navigate(Routes.SignIn)
             }
+
             is AuthState.Authenticated -> {
-                items = listOf(BottomNavItem.Home, BottomNavItem.Game, BottomNavItem.MatchHistory, BottomNavItem.Forum)
+                items = listOf(
+                    BottomNavItem.Home,
+                    BottomNavItem.JoinGame,
+                    BottomNavItem.MatchHistory,
+                    BottomNavItem.Forum
+                )
                 navController.navigate(Routes.Home)
             }
+
             is AuthState.Error -> {
-                Toast.makeText(context, (authState as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, (authState as AuthState.Error).message, Toast.LENGTH_SHORT)
+                    .show()
             }
+
             else -> Unit
         }
     }
@@ -196,7 +204,11 @@ fun MainScreen(navController: NavHostController, viewModel: UserViewModel = koin
 }
 
 @Composable
-fun Navigation(navController: NavHostController, innerPadding: PaddingValues, viewModel: UserViewModel) {
+fun Navigation(
+    navController: NavHostController,
+    innerPadding: PaddingValues,
+    viewModel: UserViewModel
+) {
     NavHost(
         navController = navController,
         startDestination = Routes.SignIn,
@@ -204,8 +216,14 @@ fun Navigation(navController: NavHostController, innerPadding: PaddingValues, vi
     ) {
         composable(Routes.SignIn) { SignInScreen(navController, viewModel) }
         composable(Routes.SignUp) { SignUpScreen(navController, viewModel) }
-        composable(Routes.Game) { GameScreen(navController) }
-        composable(Routes.Home) { HomeScreen(navController) }
+        composable(Routes.Game) { navBackStackEntry ->
+            val side = navBackStackEntry.arguments?.getString("side")
+            val id = navBackStackEntry.arguments?.getString("id")
+            if (side != null && id != null) {
+                GameScreen(navController, side, id)
+            }
+        }
+        composable(Routes.Home) { HomeScreen(navController, viewModel) }
         composable(Routes.JoinGame) { JoinGameScreen(navController) }
         composable(Routes.MatchHistory) { MatchHistoryScreen(navController) }
         composable(Routes.Forum) { ForumScreen(navController) }

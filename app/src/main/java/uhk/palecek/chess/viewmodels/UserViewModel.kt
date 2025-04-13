@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import uhk.palecek.chess.api.ChessApi
+import uhk.palecek.chess.data.PlayerData
 import uhk.palecek.chess.data.SignData
 import uhk.palecek.chess.data.User
 import java.time.Instant
@@ -37,6 +38,14 @@ class UserViewModel(private val chessApi: ChessApi) : ViewModel() {
 
     fun isSignIn(): Boolean {
         return _authState.value is AuthState.Authenticated
+    }
+
+    fun createPlayerData(): PlayerData {
+        val decoded = decodeToken(token.value!!)
+        val exp = JSONObject(decoded).getString("exp").toLong()
+        val iat = JSONObject(decoded).getString("iat").toLong()
+        val id = JSONObject(decoded).getString("id")
+        return PlayerData(id, username.value, iat, exp, "")
     }
 
     fun checkAuthState() {
