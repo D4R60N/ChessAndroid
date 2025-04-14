@@ -18,4 +18,9 @@ interface ChessApi {
     suspend fun signIn(
         @Body() interval: SignData
     ): Response<SignInResponse<SignInData>>
+
+    @POST(value = "/api/matchHistory")
+    suspend fun getMatchHistory(
+        @Body() interval: SignData
+    ): Response<SignInResponse<SignInData>>
 }
