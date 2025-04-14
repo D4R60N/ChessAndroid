@@ -225,7 +225,7 @@ fun Navigation(
         }
         composable(Routes.Home) { HomeScreen(navController, viewModel) }
         composable(Routes.JoinGame) { JoinGameScreen(navController) }
-        composable(Routes.MatchHistory) { MatchHistoryScreen(navController) }
+        composable(Routes.MatchHistory) { MatchHistoryScreen(navController, viewModel) }
         composable(Routes.Forum) { ForumScreen(navController) }
     }
 }
