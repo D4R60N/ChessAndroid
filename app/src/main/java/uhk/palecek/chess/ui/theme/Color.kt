@@ -14,3 +14,9 @@ val DarkSquareColor = Color(0xFF4B2F13)
 val LightSquareColor = Color(0xFF818181)
 val SelectedSquareColor = Color(0xFFFFEB3B)
 val HighlightedSquareColor = Color(0xFFE91E1E)
+
+val WinColor = Color(0xFF4CAF50)
+val LoseColor = Color(0xFFE91E2F)
+val DrawColor = Color(0xFFFFC107)
+
+val Black = Color(0xFF000000)

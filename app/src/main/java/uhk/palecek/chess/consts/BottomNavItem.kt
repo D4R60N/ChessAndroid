@@ -13,7 +13,6 @@ sealed class BottomNavItem(val title: String, val icon: ImageVector, val screenR
     object JoinGame : BottomNavItem("JoinGame", Icons.Filled.PlayArrow, Routes.JoinGame)
     object Home : BottomNavItem("Home", Icons.Filled.Home, Routes.Home)
     object MatchHistory : BottomNavItem("MatchHistory", Icons.Filled.DateRange, Routes.MatchHistory)
-    object Forum : BottomNavItem("Forum", Icons.AutoMirrored.Filled.List, Routes.Forum)
     object SignIn : BottomNavItem("Sign In", Icons.Filled.Person, Routes.SignIn)
     object SignUp : BottomNavItem("Sign Up", Icons.Outlined.Person, Routes.SignUp)
 }

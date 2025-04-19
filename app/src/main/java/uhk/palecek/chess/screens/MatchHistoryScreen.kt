@@ -37,7 +37,7 @@ fun MatchHistoryScreen(
     LaunchedEffect(Unit) {
         if (userViewModel.isSignIn())
             matchHistoryViewModel.getMatchHistoryList(
-                userViewModel.createPlayerData().id,
+                userViewModel.createPlayerData().id.toString(),
                 userViewModel.token.value.toString()
             )
     }
@@ -56,7 +56,7 @@ fun MatchHistoryScreen(
                 val matchHistory = (matchHistoryList as ApiResult.Success).data
                 LazyColumn(state = listState) {
                     items(matchHistory) { matchHistory ->
-                        MatchHistoryItem(matchHistory)
+                        MatchHistoryItem(matchHistory, userViewModel.username.value)
                     }
                 }
             }

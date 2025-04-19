@@ -6,7 +6,6 @@ object Routes {
     const val Game = "game/{side}/{id}"
     const val JoinGame = "join-game"
     const val MatchHistory = "match-history"
-    const val Forum = "forum"
     const val Home = "home"
     const val SignIn = "sign-in"
     const val SignUp = "sign-up"

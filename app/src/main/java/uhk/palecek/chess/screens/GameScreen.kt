@@ -53,6 +53,15 @@ fun GameScreen(
                 players = playerList.players
             }
         }
+        if (side == "black") {
+            mSocket.emit("joinRoom", id, Ack { args ->
+                Log.d("room", args[0].toString())
+                val playerList = gson.fromJson(args[0].toString(), RoomData::class.java)
+                Handler(Looper.getMainLooper()).post {
+                    players = playerList.players
+                }
+            })
+        }
     }
     DisposableEffect(Unit) {
         onDispose {
@@ -60,17 +69,16 @@ fun GameScreen(
             mSocket.off("playerDisconnected")
             mSocket.off("endGame")
             mSocket.off("move")
+            mSocket.off("joinRoom")
             mSocket.close()
             SocketHandler.closeConnection()
         }
     }
     Column(modifier = Modifier.padding(16.dp)) {
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Welcome to the game.")
         if(players.size < 2)
             Text("Waiting for other player!")
         else
-            BoardComponent(side, id, players)
+            BoardComponent(side, id, players, navController)
     }
 }
 

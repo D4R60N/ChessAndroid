@@ -2,11 +2,15 @@ package uhk.palecek.chess.components
 
 import android.os.Handler
 import android.os.Looper
+import androidx.compose.animation.core.Animation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,7 +19,10 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.PieceType
@@ -24,12 +31,19 @@ import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.move.Move
 import com.google.gson.Gson
+import org.json.JSONArray
 import org.json.JSONObject
+import uhk.palecek.chess.consts.Routes
 import uhk.palecek.chess.data.PlayerData
 import uhk.palecek.chess.utils.SocketHandler
 
 @Composable
-fun BoardComponent(sideString: String, id: String, players: List<PlayerData>) {
+fun BoardComponent(
+    sideString: String,
+    id: String,
+    players: List<PlayerData>,
+    navController: NavController
+) {
     var selectedSpace: Square? by remember { mutableStateOf(null) }
     var side: Side = if (sideString == "white") Side.WHITE else Side.BLACK
     val highlightedSpaces: MutableSet<Square> by remember { mutableStateOf(mutableSetOf<Square>()) }
@@ -47,9 +61,17 @@ fun BoardComponent(sideString: String, id: String, players: List<PlayerData>) {
         if (board.isMated) {
             winner = if (board.sideToMove == Side.BLACK) players[0].id else players[1].id
             gameOver =
-                "Checkmate! ${if (board.sideToMove == Side.WHITE) "black" else "white"} wins!"
+                "Checkmate! The ${if (board.sideToMove == Side.BLACK) "black" else "white"} wins!"
+            val obj = JSONObject()
+            obj.put("roomId", id)
+            obj.put("winner", winner)
+            mSocket.emit("endGame", obj)
         } else if (board.isDraw) {
             gameOver = "Draw!"
+            val obj = JSONObject()
+            obj.put("roomId", id)
+            obj.put("winner", null)
+            mSocket.emit("endGame", obj)
         }
     }
 
@@ -62,10 +84,10 @@ fun BoardComponent(sideString: String, id: String, players: List<PlayerData>) {
             }
         }
         mSocket.on("endGame") { args ->
-            val roomId = args[0] as String
-            if (roomId == id) {
-                Handler(Looper.getMainLooper()).post {
-                }
+            val obj = JSONObject(args[0].toString())
+            Handler(Looper.getMainLooper()).post {
+                winner = obj.getString("winner")
+                gameOver = "Checkmate! The ${side.flip()} wins!"
             }
         }
         mSocket.on("move") { args ->
@@ -78,7 +100,7 @@ fun BoardComponent(sideString: String, id: String, players: List<PlayerData>) {
             )
             val move = Move(from, to, promotion)
             makeAMove(move)
-            recompose+=1;
+            recompose += 1;
         }
 
     }
@@ -88,7 +110,6 @@ fun BoardComponent(sideString: String, id: String, players: List<PlayerData>) {
             Box(
                 Modifier
                     .fillMaxSize()
-                    .aspectRatio(1.1f)
             ) {
                 Column {
                     for (rank in 8 downTo 1) {
@@ -164,7 +185,15 @@ fun BoardComponent(sideString: String, id: String, players: List<PlayerData>) {
                 }
             }
         } else {
-            Text("The ${side.flip()} has won!")
+            Column()
+            {
+                Text("The ${side.flip()} has won! \uD83C\uDF89", fontSize = 24.sp)
+                Button(onClick = {
+                    navController.navigate(Routes.Home)
+                }) {
+                    Text("Back to Home")
+                }
+            }
         }
     }
 }

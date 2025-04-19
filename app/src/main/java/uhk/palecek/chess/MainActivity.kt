@@ -44,9 +44,8 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.context.startKoin
 import uhk.palecek.chess.ui.theme.ChessTheme
-import uhk.palecek.chess.consts.BottomNavItem;
-import uhk.palecek.chess.consts.Routes;
-import uhk.palecek.chess.screens.ForumScreen
+import uhk.palecek.chess.consts.BottomNavItem
+import uhk.palecek.chess.consts.Routes
 import uhk.palecek.chess.screens.GameScreen
 import uhk.palecek.chess.screens.HomeScreen
 import uhk.palecek.chess.screens.JoinGameScreen
@@ -108,7 +107,6 @@ fun MainScreen(navController: NavHostController, viewModel: UserViewModel = koin
                     BottomNavItem.Home,
                     BottomNavItem.JoinGame,
                     BottomNavItem.MatchHistory,
-                    BottomNavItem.Forum
                 )
                 navController.navigate(Routes.Home)
             }
@@ -133,29 +131,17 @@ fun MainScreen(navController: NavHostController, viewModel: UserViewModel = koin
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
                 ),
-                navigationIcon = {
-                    if (navBackStackEntry != null) {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
-                                tint = Color.White,
-                                contentDescription = "Back"
-                            )
-
-                        }
-                    }
-                },
-                actions = {
-                    if (currentRoute != Routes.Settings) {
-                        IconButton(onClick = { navController.navigate(Routes.Settings) }) {
-                            Icon(
-                                Icons.Filled.Settings,
-                                tint = Color.White,
-                                contentDescription = "Settings"
-                            )
-                        }
-                    }
-                }
+//                actions = {
+//                    if (currentRoute != Routes.Settings) {
+//                        IconButton(onClick = { navController.navigate(Routes.Settings) }) {
+//                            Icon(
+//                                Icons.Filled.Settings,
+//                                tint = Color.White,
+//                                contentDescription = "Settings"
+//                            )
+//                        }
+//                    }
+//                }
             )
         },
         bottomBar = {
@@ -224,9 +210,8 @@ fun Navigation(
             }
         }
         composable(Routes.Home) { HomeScreen(navController, viewModel) }
-        composable(Routes.JoinGame) { JoinGameScreen(navController) }
+        composable(Routes.JoinGame) { JoinGameScreen(navController, viewModel) }
         composable(Routes.MatchHistory) { MatchHistoryScreen(navController, viewModel) }
-        composable(Routes.Forum) { ForumScreen(navController) }
     }
 }
 

@@ -7,12 +7,14 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import uhk.palecek.chess.api.ChessApi
+import uhk.palecek.chess.viewmodels.GamesViewModel
 import uhk.palecek.chess.viewmodels.MatchHistoryViewModel
 import uhk.palecek.chess.viewmodels.UserViewModel
 
 val viewModelModule = module {
     viewModel { UserViewModel(get()) }
     viewModel { MatchHistoryViewModel(get()) }
+    viewModel { GamesViewModel(get()) }
 }
 
 
