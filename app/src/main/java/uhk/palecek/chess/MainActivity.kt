@@ -7,10 +7,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,16 +29,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import cz.uhk.fim.cryptoapp.networkModule
+import cz.uhk.fim.cryptoapp.objectBoxModule
+import cz.uhk.fim.cryptoapp.repositoryModule
 import cz.uhk.fim.cryptoapp.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
@@ -59,19 +63,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        try
-//        {
-//            val mSocket: Socket = IO.socket("localhost:8080")
-//            mSocket.connect()
-//        } catch (e: URISyntaxException)
-//        {
-//            println(e)
-//        }
         startKoin {
             androidContext(this@MainActivity)
             modules(
+                repositoryModule,
                 viewModelModule,
                 networkModule,
+                objectBoxModule
             )
         }
         enableEdgeToEdge()
@@ -91,6 +89,7 @@ fun MainScreen(navController: NavHostController, viewModel: UserViewModel = koin
     val context = LocalContext.current
     var selectedItem by remember { mutableStateOf(0) }
     var items by remember { mutableStateOf(listOf<BottomNavItem>()) }
+    val username by viewModel.username.collectAsState()
     Log.d("ViewModelCheck", "MainActivity: ${viewModel.hashCode()}")
     LaunchedEffect(authState) {
         when (authState) {
@@ -131,17 +130,20 @@ fun MainScreen(navController: NavHostController, viewModel: UserViewModel = koin
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
                 ),
-//                actions = {
-//                    if (currentRoute != Routes.Settings) {
-//                        IconButton(onClick = { navController.navigate(Routes.Settings) }) {
-//                            Icon(
-//                                Icons.Filled.Settings,
-//                                tint = Color.White,
-//                                contentDescription = "Settings"
-//                            )
-//                        }
-//                    }
-//                }
+                actions = {
+                    if (currentRoute != Routes.SignIn && currentRoute != Routes.SignUp) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = username,  color = Color.White, fontSize = 20.sp)
+                            IconButton(onClick = { viewModel.signOut() }) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ExitToApp,
+                                    tint = Color.White,
+                                    contentDescription = "Sign out"
+                                )
+                            }
+                        }
+                    }
+                }
             )
         },
         bottomBar = {

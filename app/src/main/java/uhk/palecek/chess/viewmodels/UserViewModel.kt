@@ -1,5 +1,6 @@
 package uhk.palecek.chess.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,11 +12,14 @@ import uhk.palecek.chess.api.ChessApi
 import uhk.palecek.chess.data.PlayerData
 import uhk.palecek.chess.data.SignData
 import uhk.palecek.chess.data.User
+import uhk.palecek.chess.data.UserData
+import uhk.palecek.chess.repository.UserRepository
 import java.time.Instant
 import java.util.Base64
 
 
-class UserViewModel(private val chessApi: ChessApi) : ViewModel() {
+class UserViewModel(private val chessApi: ChessApi, private val userRepository: UserRepository) :
+    ViewModel() {
     private val _username: MutableStateFlow<String> = MutableStateFlow<String>("")
     private val _token: MutableStateFlow<String?> = MutableStateFlow<String?>(null)
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
@@ -49,17 +53,30 @@ class UserViewModel(private val chessApi: ChessApi) : ViewModel() {
     }
 
     fun checkAuthState() {
-        if (token.value == null) {
-            _authState.value = AuthState.Unauthenticated
-        } else {
-            val decoded = decodeToken(token.value!!)
-            val expiration = JSONObject(decoded).getString("exp")
-            val instant = Instant.ofEpochSecond(expiration.toLong())
-            if (Instant.now().isBefore(instant)) {
-                _authState.value = AuthState.Authenticated
+        viewModelScope.launch {
+            if (token.value == null) {
+                val user = userRepository.getUserData()
+                if (user == null) {
+                    _authState.value = AuthState.Unauthenticated
+                } else {
+                    _token.value = user.token
+                    _username.value = user.username
+                    resolveToken(user.token)
+                }
             } else {
-                _authState.value = AuthState.Unauthenticated
+                resolveToken(token.value!!)
             }
+        }
+    }
+
+    fun resolveToken(token: String) {
+        val decoded = decodeToken(token)
+        val expiration = JSONObject(decoded).getString("exp")
+        val instant = Instant.ofEpochSecond(expiration.toLong())
+        if (Instant.now().isBefore(instant)) {
+            _authState.value = AuthState.Authenticated
+        } else {
+            _authState.value = AuthState.Unauthenticated
         }
     }
 
@@ -72,6 +89,7 @@ class UserViewModel(private val chessApi: ChessApi) : ViewModel() {
                     _username.value = username
                     _token.value = response.body()!!.token
                     _authState.value = AuthState.Authenticated
+                    userRepository.setUserData(UserData(0, response.body()!!.token, username))
                 } else {
                     _token.value = null
                     _authState.value = AuthState.Error(response.message())
@@ -82,6 +100,7 @@ class UserViewModel(private val chessApi: ChessApi) : ViewModel() {
             }
         }
     }
+
     fun signUp(username: String, password: String) {
         val signData = SignData(User(username, password))
         viewModelScope.launch {
@@ -97,10 +116,14 @@ class UserViewModel(private val chessApi: ChessApi) : ViewModel() {
             }
         }
     }
+
     fun signOut() {
         _username.value = ""
         _token.value = null
         _authState.value = AuthState.Unauthenticated
+        viewModelScope.launch {
+            userRepository.removeUserData()
+        }
     }
 }
 
