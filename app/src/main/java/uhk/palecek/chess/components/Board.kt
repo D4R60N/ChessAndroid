@@ -64,7 +64,7 @@ fun BoardComponent(
         if (board.isMated) {
             winner = if (board.sideToMove == Side.BLACK) players[0].id else players[1].id
             gameOver =
-                "Checkmate! The ${players.find { it.id == winner }} wins!"
+                "Checkmate! The ${(players.find { it.id == winner })?.username} wins!"
             val obj = JSONObject()
             obj.put("roomId", id)
             obj.put("winner", winner)
@@ -90,7 +90,7 @@ fun BoardComponent(
             val obj = JSONObject(args[0].toString())
             Handler(Looper.getMainLooper()).post {
                 winner = obj.getString("winner")
-                gameOver = "Checkmate! The ${players.find { it.id == winner }} wins!"
+                gameOver = "Checkmate! The ${(players.find { it.id == winner })?.username} wins!"
             }
         }
         mSocket.on("move") { args ->
@@ -191,7 +191,7 @@ fun BoardComponent(
         } else {
             Column()
             {
-                Header("The ${side.flip()} has won! \uD83C\uDF89")
+                Header("The ${(players.find { it.id == winner })?.username} has won! \uD83C\uDF89")
                 Button(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = DarkSquareColor,
