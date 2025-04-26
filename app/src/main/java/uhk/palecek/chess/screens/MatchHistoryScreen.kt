@@ -6,8 +6,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -21,17 +22,17 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
 import uhk.palecek.chess.api.ApiResult
+import uhk.palecek.chess.components.Header
 import uhk.palecek.chess.components.MatchHistoryItem
 import uhk.palecek.chess.viewmodels.MatchHistoryViewModel
 import uhk.palecek.chess.viewmodels.UserViewModel
 
 @Composable
 fun MatchHistoryScreen(
-    navController: NavController,
     userViewModel: UserViewModel,
     matchHistoryViewModel: MatchHistoryViewModel = koinViewModel<MatchHistoryViewModel>(),
 ) {
-    val listState = rememberLazyListState()
+    val username = userViewModel.username.collectAsState()
     val matchHistoryList by matchHistoryViewModel.matchHistoryList.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -43,7 +44,7 @@ fun MatchHistoryScreen(
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
-        Text("Match History")
+        Header("Match History")
         Spacer(modifier = Modifier.height(16.dp))
         when (matchHistoryList) {
             is ApiResult.Loading -> {
@@ -54,9 +55,9 @@ fun MatchHistoryScreen(
 
             is ApiResult.Success -> {
                 val matchHistory = (matchHistoryList as ApiResult.Success).data
-                LazyColumn(state = listState) {
-                    items(matchHistory) { matchHistory ->
-                        MatchHistoryItem(matchHistory, userViewModel.username.value)
+                LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 128.dp)) {
+                    items(matchHistory, key = { it.date }) { matchHistoryItem ->
+                        MatchHistoryItem(matchHistoryItem, username.value)
                     }
                 }
             }

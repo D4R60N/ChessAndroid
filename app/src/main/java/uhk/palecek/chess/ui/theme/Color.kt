@@ -20,3 +20,4 @@ val LoseColor = Color(0xFFE91E2F)
 val DrawColor = Color(0xFFFFC107)
 
 val Black = Color(0xFF000000)
+val White = Color(0xFFFFFFFF)

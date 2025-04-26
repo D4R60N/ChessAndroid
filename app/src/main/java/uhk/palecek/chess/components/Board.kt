@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.github.bhlangonijr.chesslib.Board
@@ -35,6 +37,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import uhk.palecek.chess.consts.Routes
 import uhk.palecek.chess.data.PlayerData
+import uhk.palecek.chess.ui.theme.DarkSquareColor
 import uhk.palecek.chess.utils.SocketHandler
 
 @Composable
@@ -61,7 +64,7 @@ fun BoardComponent(
         if (board.isMated) {
             winner = if (board.sideToMove == Side.BLACK) players[0].id else players[1].id
             gameOver =
-                "Checkmate! The ${if (board.sideToMove == Side.BLACK) "black" else "white"} wins!"
+                "Checkmate! The ${players.find { it.id == winner }} wins!"
             val obj = JSONObject()
             obj.put("roomId", id)
             obj.put("winner", winner)
@@ -87,7 +90,7 @@ fun BoardComponent(
             val obj = JSONObject(args[0].toString())
             Handler(Looper.getMainLooper()).post {
                 winner = obj.getString("winner")
-                gameOver = "Checkmate! The ${side.flip()} wins!"
+                gameOver = "Checkmate! The ${players.find { it.id == winner }} wins!"
             }
         }
         mSocket.on("move") { args ->
@@ -110,6 +113,7 @@ fun BoardComponent(
             Box(
                 Modifier
                     .fillMaxSize()
+                    .aspectRatio(1f)
             ) {
                 Column {
                     for (rank in 8 downTo 1) {
@@ -187,10 +191,15 @@ fun BoardComponent(
         } else {
             Column()
             {
-                Text("The ${side.flip()} has won! \uD83C\uDF89", fontSize = 24.sp)
-                Button(onClick = {
-                    navController.navigate(Routes.Home)
-                }) {
+                Header("The ${side.flip()} has won! \uD83C\uDF89")
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = DarkSquareColor,
+                        contentColor = Color.White
+                    ),
+                    onClick = {
+                        navController.navigate(Routes.Home)
+                    }) {
                     Text("Back to Home")
                 }
             }

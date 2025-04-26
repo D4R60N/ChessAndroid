@@ -1,5 +1,6 @@
 package uhk.palecek.chess
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -56,6 +57,9 @@ import uhk.palecek.chess.screens.JoinGameScreen
 import uhk.palecek.chess.screens.MatchHistoryScreen
 import uhk.palecek.chess.screens.SignInScreen
 import uhk.palecek.chess.screens.SignUpScreen
+import uhk.palecek.chess.ui.theme.DarkSquareColor
+import uhk.palecek.chess.ui.theme.LightSquareColor
+import uhk.palecek.chess.utils.SocketHandler
 import uhk.palecek.chess.viewmodels.AuthState
 import uhk.palecek.chess.viewmodels.UserViewModel
 
@@ -79,6 +83,9 @@ class MainActivity : ComponentActivity() {
                 MainScreen(navController)
             }
         }
+    }
+    @SuppressLint("MissingSuperCall")
+    override fun onBackPressed() {
     }
 }
 
@@ -127,14 +134,15 @@ fun MainScreen(navController: NavHostController, viewModel: UserViewModel = koin
             TopAppBar(
                 title = { Text("Chess App") },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = DarkSquareColor,
                     titleContentColor = Color.White
                 ),
                 actions = {
                     if (currentRoute != Routes.SignIn && currentRoute != Routes.SignUp) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(text = username,  color = Color.White, fontSize = 20.sp)
-                            IconButton(onClick = { viewModel.signOut() }) {
+                            IconButton(onClick = {
+                                viewModel.signOut() }) {
                                 Icon(
                                     Icons.AutoMirrored.Filled.ExitToApp,
                                     tint = Color.White,
@@ -147,42 +155,44 @@ fun MainScreen(navController: NavHostController, viewModel: UserViewModel = koin
             )
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.primary,
-            ) {
-                items.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        icon = {
-                            Icon(
-                                item.icon,
-                                contentDescription = item.title
-                            )
-                        },
-                        label = { Text(item.title) },
-                        selected = selectedItem == index,
-                        onClick = {
-                            selectedItem = index
-                            navController.navigate(item.screenRoute) {
-                                navController.graph.startDestinationRoute?.let { screenRoute ->
-                                    popUpTo(screenRoute) {
-                                        saveState =
-                                            true
+            if (!currentRoute.equals(Routes.Game)) {
+                NavigationBar(
+                    containerColor = LightSquareColor,
+                ) {
+                    items.forEachIndexed { index, item ->
+                        NavigationBarItem(
+                            icon = {
+                                Icon(
+                                    item.icon,
+                                    contentDescription = item.title
+                                )
+                            },
+                            label = { Text(item.title) },
+                            selected = selectedItem == index,
+                            onClick = {
+                                selectedItem = index
+                                navController.navigate(item.screenRoute) {
+                                    navController.graph.startDestinationRoute?.let { screenRoute ->
+                                        popUpTo(screenRoute) {
+                                            saveState =
+                                                true
+                                        }
                                     }
+                                    launchSingleTop =
+                                        true
+                                    restoreState =
+                                        true
                                 }
-                                launchSingleTop =
-                                    true
-                                restoreState =
-                                    true
-                            }
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.White,
-                            unselectedIconColor = Color.LightGray,
-                            selectedTextColor = Color.White,
-                            unselectedTextColor = Color.LightGray,
-                            indicatorColor = MaterialTheme.colorScheme.secondary
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = Color.White,
+                                unselectedIconColor = Color.LightGray,
+                                selectedTextColor = Color.White,
+                                unselectedTextColor = Color.LightGray,
+                                indicatorColor = MaterialTheme.colorScheme.secondary
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
@@ -202,8 +212,8 @@ fun Navigation(
         startDestination = Routes.SignIn,
         modifier = Modifier.padding(innerPadding)
     ) {
-        composable(Routes.SignIn) { SignInScreen(navController, viewModel) }
-        composable(Routes.SignUp) { SignUpScreen(navController, viewModel) }
+        composable(Routes.SignIn) { SignInScreen(viewModel) }
+        composable(Routes.SignUp) { SignUpScreen(viewModel) }
         composable(Routes.Game) { navBackStackEntry ->
             val side = navBackStackEntry.arguments?.getString("side")
             val id = navBackStackEntry.arguments?.getString("id")
@@ -213,7 +223,7 @@ fun Navigation(
         }
         composable(Routes.Home) { HomeScreen(navController, viewModel) }
         composable(Routes.JoinGame) { JoinGameScreen(navController, viewModel) }
-        composable(Routes.MatchHistory) { MatchHistoryScreen(navController, viewModel) }
+        composable(Routes.MatchHistory) { MatchHistoryScreen(viewModel) }
     }
 }
 

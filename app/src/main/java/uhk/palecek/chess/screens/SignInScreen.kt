@@ -15,11 +15,10 @@ import uhk.palecek.chess.viewmodels.UserViewModel
 
 @Composable
 fun SignInScreen(
-    navController: NavController,
     viewModel: UserViewModel
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
-        SignInComponent(navController, viewModel)
+        SignInComponent(viewModel)
     }
 }
 

@@ -13,11 +13,10 @@ import uhk.palecek.chess.viewmodels.UserViewModel
 
 @Composable
 fun SignUpScreen(
-    navController: NavController,
     viewModel: UserViewModel
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
-        SignUpComponent(navController, viewModel)
+        SignUpComponent(viewModel)
     }
 }
 

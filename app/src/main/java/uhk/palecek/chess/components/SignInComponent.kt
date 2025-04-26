@@ -37,7 +37,6 @@ import uhk.palecek.chess.viewmodels.UserViewModel
 
 @Composable
 fun SignInComponent(
-    navController: NavController,
     viewModel: UserViewModel
 ) {
     var username: String by remember { mutableStateOf("") }
